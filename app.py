@@ -9,22 +9,16 @@ from resources.user import UserRegister
 from resources.item import Item, ItemList
 from resources.store import Store, StoreList
 
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=1800) # config JWT to expire within half an hour
 app.secret_key = 'jose' # this needs to be secret, and it should be secure, aka long and complicated
 api = Api(app)
-
-@app.before_first_request
-def create_tables():
-    db.create_all()
 
 # JWT() creates a new endpoint, /auth, when we call /auth, we send it a username and a password, JWT gets the username and pass and sends it to the JWT function
 # if the user is autherized, the /auth endpoint will return a JW token.
 
-# config JWT to expire within half an hour
-app.config['JWT_EXPIRATION_DELTA'] = timedelta(seconds=1800)
 jwt = JWT(app, authenticate, identity)
 
 api.add_resource(Item, '/item/<string:name>')
